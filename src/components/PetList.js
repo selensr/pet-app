@@ -23,12 +23,7 @@ class PetList extends React.Component {
         yukleniyor: false
       });
 
-      window.onscroll = () => {
-        this.setState({
-          index: this.state.index + 4
-        });
-        console.log(this.state.index);
-      };
+      window.addEventListener("scroll", this.handleScroll);
     });
   }
 
@@ -39,6 +34,10 @@ class PetList extends React.Component {
     if (prevProps.searchValue !== this.props.searchValue) {
       this.filterPets();
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
   }
 
   filterPets = () => {
@@ -59,6 +58,14 @@ class PetList extends React.Component {
           })
       });
     }
+  };
+
+  handleScroll = () => {
+    window.onscroll = () => {
+      this.setState({
+        index: this.state.index + 4
+      });
+    };
   };
 
   render() {
