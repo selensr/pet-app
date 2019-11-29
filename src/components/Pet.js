@@ -35,7 +35,14 @@ function Pet(props) {
           </h4>
         </div>
         <div className="card-footer">
-          <div className="btn btn-success">Favorilere Ekle</div>
+          <button
+            className="btn btn-success"
+            onClick={() => {
+              props.isLiked(props.id);
+            }}
+          >
+            Favorilere Ekle
+          </button>
         </div>
       </div>
     </div>

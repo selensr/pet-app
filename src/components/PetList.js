@@ -1,5 +1,5 @@
 import React from "react";
-import { Pet } from "../components";
+import { Pet, Modal } from "../components";
 import { getPets } from "../constants";
 import { stringContains } from "../helpers";
 
@@ -11,7 +11,9 @@ class PetList extends React.Component {
       _pets: [],
       pets: [],
       yukleniyor: true,
-      index: 0
+      index: 0,
+      liked: false,
+      likedPet: []
     };
   }
 
@@ -48,13 +50,14 @@ class PetList extends React.Component {
         })
       });
     } else {
+      const searchVal = this.props.searchValue;
       this.setState({
         pets: this.state._pets
           .filter(pet => {
             return pet.breed === this.props.activeFilter;
           })
           .filter(filteredPet => {
-            return stringContains(filteredPet.name, this.props.searchValue);
+            return searchVal.startsWith(filteredPet.name, 0);
           })
       });
     }
@@ -68,16 +71,48 @@ class PetList extends React.Component {
     };
   };
 
+  isLiked = id => {
+    this.setState(
+      {
+        liked: true,
+        likedPet: this.state.pets.filter(pet => pet.id === id)
+      },
+      () => {
+        console.log(this.state.likedPet);
+      }
+    );
+  };
+
+  closeModal = () => {
+    this.setState({
+      liked: false
+    });
+  };
+
   render() {
     const Yukleniyor = <div>Yukleniyor</div>;
 
     const EmptyPets = <div>Bulunamadı</div>;
 
+    let petResults = this.state.pets.slice(0, this.state.index);
+
     const Pets = [
+      <div>
+        {this.state.likedPet.map(pet => {
+          return (
+            <Modal
+              closeModal={this.closeModal}
+              show={this.state.liked}
+              key={Math.random()}
+              {...pet}
+            />
+          );
+        })}
+      </div>,
       <h3>Gösterilen Pet Sayısı: {this.state.pets.length}</h3>,
       <div className="row">
-        {this.state.pets.slice(0, this.state.index).map(pet => {
-          return <Pet key={Math.random()} {...pet} />;
+        {petResults.map(pet => {
+          return <Pet key={Math.random()} {...pet} isLiked={this.isLiked} />;
         })}
       </div>
     ];

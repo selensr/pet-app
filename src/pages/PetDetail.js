@@ -18,6 +18,7 @@ class PetDetail extends React.Component {
         this.setState({ pet });
       });
   }
+
   render() {
     return (
       <div className="container pet">
