@@ -7,7 +7,11 @@ function Main(props) {
     <div>
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route exact path="/favoriler" component={FavoritesPage} />
+        <Route
+          exact
+          path="/favoriler"
+          component={props => <FavoritesPage {...props} />}
+        />
         <Route exact path="/:id" component={PetDetail} />
       </Switch>
     </div>

@@ -41,7 +41,7 @@ function Pet(props) {
               props.isLiked(props.id);
             }}
           >
-            Favorilere Ekle
+            Like
           </button>
         </div>
       </div>
@@ -50,3 +50,8 @@ function Pet(props) {
 }
 
 export default Pet;
+
+/*
+değer taşımak istiyorum ama urlde gözüksün istemiyorum <Link to={{ pathname="/" state:{id: this.props.pet.id}} />
+this.props.history.push
+*/

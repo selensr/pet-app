@@ -2,6 +2,7 @@ import React from "react";
 import { Pet, Modal } from "../components";
 import { getPets } from "../constants";
 import { stringContains } from "../helpers";
+import axios from "axios";
 
 class PetList extends React.Component {
   breed;
@@ -11,9 +12,11 @@ class PetList extends React.Component {
       _pets: [],
       pets: [],
       yukleniyor: true,
-      index: 0,
+      index: 4,
       liked: false,
-      likedPet: []
+      likedPet: [],
+      favori: false,
+      favourites: []
     };
   }
 
@@ -24,11 +27,22 @@ class PetList extends React.Component {
         pets: data,
         yukleniyor: false
       });
-
-      window.addEventListener("scroll", this.handleScroll);
     });
+    this.getFavouritePets();
+    window.addEventListener("scroll", this.handleScroll);
   }
 
+  getFavouritePets = () => {
+    axios
+      .get("http://5dd7af92505c590014d3b4ac.mockapi.io/favorites")
+      .then(res =>
+        this.setState({
+          favourites: res.data
+        })
+      );
+  };
+
+  // event windowa bağlı olduğu için tüm sayfalarda scroll eventi çalışacak
   componentDidUpdate(prevProps) {
     if (prevProps.activeFilter !== this.props.activeFilter) {
       this.filterPets();
@@ -41,6 +55,8 @@ class PetList extends React.Component {
   componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
   }
+
+  // sayfayla birlikte kaldırılacak
 
   filterPets = () => {
     if (!this.props.activeFilter) {
@@ -57,7 +73,9 @@ class PetList extends React.Component {
             return pet.breed === this.props.activeFilter;
           })
           .filter(filteredPet => {
-            return searchVal.startsWith(filteredPet.name, 0);
+            return filteredPet.name
+              .toLowerCase()
+              .startsWith(searchVal.toLowerCase(), 0);
           })
       });
     }
@@ -72,21 +90,48 @@ class PetList extends React.Component {
   };
 
   isLiked = id => {
-    this.setState(
-      {
-        liked: true,
-        likedPet: this.state.pets.filter(pet => pet.id === id)
-      },
-      () => {
-        console.log(this.state.likedPet);
-      }
-    );
+    this.setState({
+      liked: true,
+      likedPet: this.state.pets.filter(pet => pet.id === id)
+    });
   };
 
   closeModal = () => {
     this.setState({
       liked: false
     });
+  };
+
+  handlePost = pet => {
+    axios
+      .post("http://5dd7af92505c590014d3b4ac.mockapi.io/favorites", {
+        pet: pet,
+        owner: "Selen"
+      })
+      .then(res => {
+        if (res) {
+          this.setState({
+            favori: !this.state.favori
+          });
+        }
+      });
+  };
+
+  // arrayToObject = array => {
+  //   array.reduce((obj, item) => {
+  //     obj[item.id] = item;
+  //     return obj;
+  //   }, {});
+  // };
+
+  checkFavorite = id => {
+    {
+      return this.state.favourites.some(pet => {
+        if (pet && pet.pet && pet.pet.id) {
+          return pet.pet.id === id;
+        }
+      });
+    }
   };
 
   render() {
@@ -105,6 +150,10 @@ class PetList extends React.Component {
               show={this.state.liked}
               key={Math.random()}
               {...pet}
+              pet={pet}
+              handlePost={this.handlePost}
+              favori={this.state.favori}
+              isFavourited={this.checkFavorite(pet.id)}
             />
           );
         })}
